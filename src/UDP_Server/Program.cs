@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
@@ -11,15 +12,15 @@ namespace Test_UDP_Server_JuniorPosition
 {
     public class Program
     {
-        private const int listenPort = 8888;
-
         static void Main(string[] args)
         {
-            UDPListener listener = new UDPListener();
+            UDPServer listener = new UDPServer();
+            listener.StartServer();
 
-            listener.RecieveMetrics();
+            if (Console.ReadKey().Key == ConsoleKey.Enter)
+            {
+                listener.StopServer();
+            }
         }
-
-
     }
 }

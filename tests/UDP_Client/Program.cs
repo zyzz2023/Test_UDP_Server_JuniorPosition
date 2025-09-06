@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UDP_Client
@@ -13,7 +14,16 @@ namespace UDP_Client
         {
             using (UdpClient client = new UdpClient())
             {
-                string message = "cpu_load:-3.3 ";
+                //for(int i = 0; i < 20; i++)
+                //{
+                //    Thread.Sleep(100);
+                //    string message = $"metric_number:{i}";
+                //    byte[] data = Encoding.UTF8.GetBytes(message);
+
+                //    client.Send(data, data.Length, "localhost", 8888);
+                //    Console.WriteLine($"Отправлено: {message}");
+                //}
+                string message = $"temp_cpu:4";
                 byte[] data = Encoding.UTF8.GetBytes(message);
 
                 client.Send(data, data.Length, "localhost", 8888);
