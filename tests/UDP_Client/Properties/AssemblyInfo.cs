@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов для изменения сведений,
 // связанные с этой сборкой.
-[assembly: AssemblyTitle("Test_UDP_Server_JuniorPosition")]
+[assembly: AssemblyTitle("UDP_Client")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Test_UDP_Server_JuniorPosition")]
+[assembly: AssemblyProduct("UDP_Client")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID представляет идентификатор typelib, если этот проект доступен из модели COM
-[assembly: Guid("0a845a4f-4f32-4cf9-bce3-2c2d828547c5")]
+[assembly: Guid("b996af01-b0eb-4da8-b3d9-149b98910ae0")]
 
 // Сведения о версии сборки состоят из указанных ниже четырех значений:
 //
