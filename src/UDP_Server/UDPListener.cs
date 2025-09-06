@@ -49,7 +49,20 @@ namespace Test_UDP_Server_JuniorPosition
         }
         public void ReceiveMetrics()
         {
-            _listener = new UdpClient(_listenPort);
+            try
+            {
+                _listener = new UdpClient(_listenPort);
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"Не удалось открыть порт {_listenPort}: {ex.Message}");
+                if (_receiverThread != null && _receiverThread.IsAlive)
+                    _receiverThread.Join();
+
+                if (_workingThread != null && _workingThread.IsAlive)
+                    _workingThread.Join();
+                return;
+            }
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, _listenPort);
 
             while (!_cts.Token.IsCancellationRequested)
@@ -65,7 +78,10 @@ namespace Test_UDP_Server_JuniorPosition
 
                     if (TryParseMetric(metric, out string name, out double value, out string error))
                     {
-                        _queue.Enqueue(metric);
+                        lock (_locker)
+                        {
+                            _queue.Enqueue(metric);
+                        }
                     }
                     else
                     {
@@ -119,7 +135,12 @@ namespace Test_UDP_Server_JuniorPosition
             
             if (_queue.Count > 0)
             {
-                var metric = _queue.Dequeue();
+                string metric = null;
+                
+                lock (_locker)
+                {
+                    metric = _queue.Dequeue();
+                }
                 TryParseMetric(metric, out string name, out double value, out string error);
 
                 lock (_locker)

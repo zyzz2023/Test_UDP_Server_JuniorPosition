@@ -13,21 +13,21 @@ namespace UDP_Client
         static void Main(string[] args)
         {
             using (UdpClient client = new UdpClient())
-            {
-                //for(int i = 0; i < 20; i++)
-                //{
-                //    Thread.Sleep(100);
-                //    string message = $"metric_number:{i}";
-                //    byte[] data = Encoding.UTF8.GetBytes(message);
+            {   
+                for(int i = 0; i < 20; i++)
+                {
+                    Thread.Sleep(100);
+                    string message = $"metric_number:{i}";
+                    byte[] data = Encoding.UTF8.GetBytes(message);
 
-                //    client.Send(data, data.Length, "localhost", 8888);
-                //    Console.WriteLine($"Отправлено: {message}");
-                //}
-                string message = $"temp_cpu:4";
-                byte[] data = Encoding.UTF8.GetBytes(message);
-
-                client.Send(data, data.Length, "localhost", 8888);
-                Console.WriteLine($"Отправлено: {message}");
+                    client.Send(data, data.Length, "localhost", 8888);
+                    Console.WriteLine($"Отправлено: {message}");
+                }
+                //string message = $"temp_cpu:4";
+                //byte[] data = Encoding.UTF8.GetBytes(message);
+                //
+                //client.Send(data, data.Length, "localhost", 8888);
+                //Console.WriteLine($"Отправлено: {message}");
             }
         }
     }
