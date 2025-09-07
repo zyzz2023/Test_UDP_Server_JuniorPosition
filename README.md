@@ -1,19 +1,22 @@
-# UDP Server
+# Тестовое задание: UDP-сервер сбора метрик  
 
-A lightweight and efficient UDP server implementation in C# for handling network communications.
+Необходимо разработать простой консольный сервер, который принимает показатели (метрики) от 
+клиентов по протоколу UDP и выводит их в консоль. 
+Сервер должен: 
+- Принимать данные от клиентов по UDP-протоколу, 
+- Хранить значения метрик, 
+- Выводить актуальные метрики.
 
-## Features
+## Особенности
 
-- ✅ UDP packet reception on configurable port
-- ✅ IPv4 and IPv6 support
-- ✅ Configurable buffer size
+- ✅ Сервер слушает порт 8888
+- ✅ Сервер работает в двух потоках: поток приема и поток обработки и вывода метрик
+- ✅ Тестировка реализована самописным UDP-клиентом /tests/UDPClient
 
-## Quick Start
-
-### Prerequisites
-- .NET Framework 4.8
-
-### Installation
+## Стек технологий
+- C# .NET Framework 4.8
+- System.Threading.Thread 
+### Установка
 
 ```bash
 # Clone the repository
