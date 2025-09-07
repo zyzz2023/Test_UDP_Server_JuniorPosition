@@ -51,6 +51,8 @@ namespace Test_UDP_Server_JuniorPosition
 
             if (_workingThread != null && _workingThread.IsAlive)
                 _workingThread.Join();
+
+
         }
         public void ReceiveMetrics()
         {
