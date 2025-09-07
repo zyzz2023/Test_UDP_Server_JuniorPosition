@@ -24,11 +24,11 @@
 ```bash
 Вводите сообщения. Для выхода введите 'exit'
 > example_metric:123
-
+```
 ### Установка
 
 ```bash
 # Clone the repository
 git clone https://github.com/zyzz2023/Test_UDP_Server_JuniorPosition.git
-
+```
 
