@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Globalization;
 using System.Threading;
+using System.Linq.Expressions;
 
 namespace Test_UDP_Server_JuniorPosition
 {
@@ -21,8 +22,8 @@ namespace Test_UDP_Server_JuniorPosition
         private Thread _receiverThread;
         private Thread _workingThread;
 
-        private Queue<string> _queue = new Queue<string>();
-        private Dictionary<string, double> _dictionary = new Dictionary<string, double>();
+        private Queue<string> SharedQueue = new Queue<string>();
+        private Dictionary<string, double> MetricDictionary = new Dictionary<string, double>();
 
         public void StartServer()
         {
@@ -72,7 +73,7 @@ namespace Test_UDP_Server_JuniorPosition
                         {
                             lock (_locker)
                             {
-                                _queue.Enqueue(metric);
+                                SharedQueue.Enqueue(metric);
                             }
                         }
                         else
@@ -125,26 +126,26 @@ namespace Test_UDP_Server_JuniorPosition
         private void CheckQueue()
         {
             
-            if (_queue.Count > 0)
+            if (SharedQueue.Count > 0)
             {
                 string metric = null;
                 
                 lock (_locker)
                 {
-                    metric = _queue.Dequeue();
+                    metric = SharedQueue.Dequeue();
                 }
 
                 TryParseMetric(metric, out string name, out double value, out string error);
 
                 lock (_locker)
                 {
-                    if (_dictionary.ContainsKey(name))
+                    if (MetricDictionary.ContainsKey(name))
                     {
-                        _dictionary[name] = value;
+                        MetricDictionary[name] = value;
                     }
                     else
                     {
-                        _dictionary.Add(name, value);
+                        MetricDictionary.Add(name, value);
                     }
                 }
             }
@@ -152,14 +153,14 @@ namespace Test_UDP_Server_JuniorPosition
         private void PrintMetrics()
         {
             
-            if (_dictionary.Count > 0)
+            if (MetricDictionary.Count > 0)
             {
                 lock (_locker)
                 {
                     Console.Write($"[METRIC] ");
-                    foreach (var name in _dictionary.Keys)
+                    foreach (var name in MetricDictionary.Keys)
                     {
-                        Console.Write($"{name} = {_dictionary[name]} | ");
+                        Console.Write($"{name} = {MetricDictionary[name]} | ");
                     }
                     Console.WriteLine("");
                 }
@@ -202,7 +203,7 @@ namespace Test_UDP_Server_JuniorPosition
                 return false;
             }
 
-            if (double.TryParse(valueString, System.Globalization.NumberStyles.Any,
+            if (double.TryParse(valueString, NumberStyles.Any,
                 CultureInfo.GetCultureInfo("en-US"), out value))
             {
                 return true;
