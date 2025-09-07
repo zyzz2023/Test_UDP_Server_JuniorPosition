@@ -17,12 +17,6 @@
 ## Стек технологий
 - C# 
 - .NET Framework 4.8
-### Установка
-
-```bash
-# Clone the repository
-git clone https://github.com/zyzz2023/Test_UDP_Server_JuniorPosition.git
-
 ## Тестировка
 
 После запуска достаточно ввести значение метрики и нажать ENTER. Рабтающий сервер сразу примет отправленную метрику.
@@ -30,3 +24,11 @@ git clone https://github.com/zyzz2023/Test_UDP_Server_JuniorPosition.git
 ```bash
 Вводите сообщения. Для выхода введите 'exit'
 > example_metric:123
+
+### Установка
+
+```bash
+# Clone the repository
+git clone https://github.com/zyzz2023/Test_UDP_Server_JuniorPosition.git
+
+
