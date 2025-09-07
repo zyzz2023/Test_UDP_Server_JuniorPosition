@@ -12,11 +12,12 @@ namespace Test_UDP_Server_JuniorPosition
 {
     public class UDPServer
     {
+        private UdpClient Listener;
+
         private const int _listenPort = 8888;
         private object _locker = new object();
-        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private bool _isRunning = true;
 
-        private UdpClient _listener;
         private Thread _receiverThread;
         private Thread _workingThread;
 
@@ -27,19 +28,22 @@ namespace Test_UDP_Server_JuniorPosition
         {
             Console.WriteLine("Сервер запущен.");
             Console.WriteLine("Для завершения нажмите Enter.");
-
+            
             _receiverThread = new Thread(new ThreadStart(ReceiveMetrics));
             _workingThread = new Thread(new ThreadStart(WorkWithMetrics));
 
             _receiverThread.Start();
             _workingThread.Start();
 
+            _receiverThread.Name = "Поток получения";
+            _workingThread.Name = "Поток обработки";
+            
         }
 
         public void StopServer()
         {
-            _cts.Cancel();
-            _listener.Close();
+            _isRunning = false;
+            Listener.Close();
 
             if (_receiverThread != null && _receiverThread.IsAlive)
                 _receiverThread.Join();
@@ -49,61 +53,48 @@ namespace Test_UDP_Server_JuniorPosition
         }
         public void ReceiveMetrics()
         {
-            try
+            using (Listener = new UdpClient(_listenPort))
             {
-                _listener = new UdpClient(_listenPort);
-            }
-            catch (SocketException ex)
-            {
-                Console.WriteLine($"Не удалось открыть порт {_listenPort}: {ex.Message}");
-                if (_receiverThread != null && _receiverThread.IsAlive)
-                    _receiverThread.Join();
+                IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, _listenPort);
 
-                if (_workingThread != null && _workingThread.IsAlive)
-                    _workingThread.Join();
-                return;
-            }
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, _listenPort);
-
-            while (!_cts.Token.IsCancellationRequested)
-            {
-                try
+                while (_isRunning)
                 {
-                    byte[] receivedData = _listener.Receive(ref groupEP);
-                    if (receivedData.Length > 256)
+                    try
                     {
-                        continue;
-                    }
-                    string metric = Encoding.UTF8.GetString(receivedData);
-
-                    if (TryParseMetric(metric, out string name, out double value, out string error))
-                    {
-                        lock (_locker)
+                        byte[] receivedData = Listener.Receive(ref groupEP);
+                        if (receivedData.Length > 256)
                         {
-                            _queue.Enqueue(metric);
+                            continue;
+                        }
+                        string metric = Encoding.UTF8.GetString(receivedData);
+
+                        if (TryParseMetric(metric, out string name, out double value, out string error))
+                        {
+                            lock (_locker)
+                            {
+                                _queue.Enqueue(metric);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Ошибка формата: {metric}");
                         }
                     }
-                    else
+                    catch (SocketException ex)
                     {
-                        Console.WriteLine($"Ошибка формата: {metric}");
+                        if (!_isRunning) // Чтобы при завершении не выводилась ошибка прерывания Receive
+                        {
+                            Console.WriteLine("Поток приёма остановлен.");
+                            break;
+                        }
+                        Console.WriteLine($"Сетевое исключение: {ex.Message}");
                     }
-                }
-                catch (SocketException ex)
-                {
-                    if (_cts.Token.IsCancellationRequested) // Чтобы при завершении не выводилась ошибка прерывания Receive
+                    catch (Exception ex)
                     {
-                        Console.WriteLine("Поток приёма остановлен.");
-                        break;
+                        Console.WriteLine($"Ошибка: {ex.Message}");
                     }
-                    Console.WriteLine($"Сетевое исключение: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка: {ex.Message}");
                 }
             }
-
-            _listener.Dispose(); 
         }
         public void WorkWithMetrics()
         {
@@ -112,7 +103,8 @@ namespace Test_UDP_Server_JuniorPosition
 
             var lastCheckQueueTime = DateTime.Now;
             var lastPrintMetricsTime = DateTime.Now;
-            while (!_cts.Token.IsCancellationRequested)
+
+            while (_isRunning)
             {
                 var now = DateTime.Now;
                 
@@ -141,6 +133,7 @@ namespace Test_UDP_Server_JuniorPosition
                 {
                     metric = _queue.Dequeue();
                 }
+
                 TryParseMetric(metric, out string name, out double value, out string error);
 
                 lock (_locker)
